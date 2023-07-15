@@ -1,0 +1,21 @@
+---
+- name: Deploy to production
+  hosts: prod
+  become: true
+  tasks:
+    - name: Log in to Docker registry
+      docker_login:
+        username: "{{ docker_username }}"
+        password: "{{ docker_password }}"
+
+    - name: Pull the Docker image from Docker Hub
+      docker_image:
+        name: harshadeelu/edureka-cicd:latest
+        source: pull
+
+    - name: Run the Docker container in detached mode
+      docker_container:
+        name: website
+        image: harshadeelu/edureka-cicd:latest
+        state: started
+        detach: yes

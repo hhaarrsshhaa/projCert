@@ -1,15 +1,20 @@
-# Use an official Apache HTTP Server as the base image
-FROM httpd:latest
+# Use Ubuntu as the base image
+FROM ubuntu:latest
 
-# Set the working directory to /root/cicd
-WORKDIR /root/cicd
+# Install PHP and Apache
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y php apache2 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copy the website content to the container
-COPY website/ .
+# Copy website files to Apache root directory
+COPY website/ /var/www/html/
 
-# Update Apache configuration to serve from the target directory and set index.php as the default document
-RUN sed -i 's#/usr/local/apache2/htdocs#/root/cicd#g' /usr/local/apache2/conf/httpd.conf && \
-    echo "DirectoryIndex index.php" >> /usr/local/apache2/conf/httpd.conf
+# Remove default index.html from Apache root directory
+RUN rm /var/www/html/index.html
 
-# Expose port 8080 to allow incoming HTTP traffic
-EXPOSE 8080
+# Expose port 80 to allow incoming HTTP traffic
+EXPOSE 80
+
+# Start Apache in the foreground
+CMD ["apachectl", "-D", "FOREGROUND"]

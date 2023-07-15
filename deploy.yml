@@ -21,3 +21,5 @@
         image: harshadeelu/edureka-cicd:latest
         state: started
         detach: yes
+        ports:
+          - "80:80"
